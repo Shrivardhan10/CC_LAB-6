@@ -19,19 +19,16 @@ pipeline {
                 '''
             }
         }
-
         stage('Deploy Backend Containers') {
             steps {
                 sh '''
+                docker network create app-network || true
+        
                 docker rm -f backend1 backend2 || true
-
-                if [ "$BACKEND_COUNT" = "1" ]; then
-                    docker run -d --name backend1 backend-app
-                else
-                    docker run -d --name backend1 backend-app
-                    docker run -d --name backend2 backend-app
-                fi
-
+        
+                docker run -d --name backend1 --network app-network backend-app
+                docker run -d --name backend2 --network app-network backend-app
+        
                 sleep 5
                 '''
             }
